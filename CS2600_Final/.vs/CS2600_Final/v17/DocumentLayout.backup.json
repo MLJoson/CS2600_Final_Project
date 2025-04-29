@@ -1,10 +1,14 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\littl\\OneDrive\\Desktop\\Program Projects\\CS2600_Final_Project\\CS2600_Final\\",
+  "WorkspaceRootPath": "C:\\Users\\lazer\\OneDrive\\Documents\\GitHub\\CS2600_Final_Project\\CS2600_Final\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{05D8BFC5-D48F-4F2B-954A-799057DAA1C4}|CS2600_Final\\CS2600_Final.vcxproj|C:\\Users\\littl\\OneDrive\\Desktop\\Program Projects\\CS2600_Final_Project\\CS2600_Final\\CS2600_Final\\CS2600_Final.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{05D8BFC5-D48F-4F2B-954A-799057DAA1C4}|CS2600_Final\\CS2600_Final.vcxproj|solutionrelative:CS2600_Final\\CS2600_Final.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{05D8BFC5-D48F-4F2B-954A-799057DAA1C4}|CS2600_Final\\CS2600_Final.vcxproj|C:\\Users\\lazer\\OneDrive\\Documents\\GitHub\\CS2600_Final_Project\\CS2600_Final\\CS2600_Final\\testMain.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{05D8BFC5-D48F-4F2B-954A-799057DAA1C4}|CS2600_Final\\CS2600_Final.vcxproj|solutionrelative:CS2600_Final\\testMain.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{05D8BFC5-D48F-4F2B-954A-799057DAA1C4}|CS2600_Final\\CS2600_Final.vcxproj|C:\\Users\\lazer\\OneDrive\\Documents\\GitHub\\CS2600_Final_Project\\CS2600_Final\\CS2600_Final\\main.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{05D8BFC5-D48F-4F2B-954A-799057DAA1C4}|CS2600_Final\\CS2600_Final.vcxproj|solutionrelative:CS2600_Final\\main.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -19,19 +23,28 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "CS2600_Final.cpp",
-              "DocumentMoniker": "C:\\Users\\littl\\OneDrive\\Desktop\\Program Projects\\CS2600_Final_Project\\CS2600_Final\\CS2600_Final\\CS2600_Final.cpp",
-              "RelativeDocumentMoniker": "CS2600_Final\\CS2600_Final.cpp",
-              "ToolTip": "C:\\Users\\littl\\OneDrive\\Desktop\\Program Projects\\CS2600_Final_Project\\CS2600_Final\\CS2600_Final\\CS2600_Final.cpp",
-              "RelativeToolTip": "CS2600_Final\\CS2600_Final.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAABBAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-04-28T18:09:36.399Z",
+              "Title": "testMain.c",
+              "DocumentMoniker": "C:\\Users\\lazer\\OneDrive\\Documents\\GitHub\\CS2600_Final_Project\\CS2600_Final\\CS2600_Final\\testMain.c",
+              "RelativeDocumentMoniker": "CS2600_Final\\testMain.c",
+              "ToolTip": "C:\\Users\\lazer\\OneDrive\\Documents\\GitHub\\CS2600_Final_Project\\CS2600_Final\\CS2600_Final\\testMain.c",
+              "RelativeToolTip": "CS2600_Final\\testMain.c",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAABkAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
+              "WhenOpened": "2025-04-29T17:02:52.943Z",
               "EditorCaption": ""
             },
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "main.c",
+              "DocumentMoniker": "C:\\Users\\lazer\\OneDrive\\Documents\\GitHub\\CS2600_Final_Project\\CS2600_Final\\CS2600_Final\\main.c",
+              "RelativeDocumentMoniker": "CS2600_Final\\main.c",
+              "ToolTip": "C:\\Users\\lazer\\OneDrive\\Documents\\GitHub\\CS2600_Final_Project\\CS2600_Final\\CS2600_Final\\main.c",
+              "RelativeToolTip": "CS2600_Final\\main.c",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAABMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
+              "WhenOpened": "2025-04-29T00:32:00.497Z",
+              "EditorCaption": ""
             }
           ]
         }
