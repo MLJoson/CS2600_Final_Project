@@ -1,15 +1,3 @@
-#include <stdio.h>
-#include <SDL3/SDL.h>
-
-/** /int main(int argc, char* args[]) {
-	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_JOYSTICK | SDL_INIT_GAMEPAD | SDL_INIT_HAPTIC);
-// I GOT IT TO WORK!
-	printf("Hello, world!");
-	return 0;
-}
-*/
-
-
 /* clear.c ... * /
 
 /*
@@ -28,6 +16,28 @@
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
 
+/* Constants */
+#define PLAYER_SPAWN_X 100
+#define PLAYER_SPAWN_Y 100
+
+/* Player */
+typedef struct {
+    int x;
+    int y;
+    int vel_y;
+} Player;
+
+/* App State (holding variables between frames) */
+typedef struct {
+    Player player;
+} AppState;
+
+/* Initializes the player on startup or restart */
+void initialize_player(Player* player) {
+    player->x = PLAYER_SPAWN_X;
+    player->y = PLAYER_SPAWN_Y;
+}
+
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
@@ -38,26 +48,68 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
         return SDL_APP_FAILURE;
     }
 
+    // Initialize AppState
+    AppState* as = (AppState*)SDL_calloc(1, sizeof(AppState));
+    if (!as) {
+        return SDL_APP_FAILURE;
+    }
+
     if (!SDL_CreateWindowAndRenderer("examples/renderer/clear", 640, 480, 0, &window, &renderer)) {
         SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
 
+    // Initialize player
+    initialize_player(&as->player);
+
     return SDL_APP_CONTINUE;  /* carry on with the program! */
+}
+
+void move_player(Player* player, SDL_Scancode key_code) {
+    // TODO: Implement moving
+}
+
+static SDL_AppResult handle_key_event_(Player* player, SDL_Scancode key_code) {
+    switch (key_code) {
+        // Pressing Q quits the game
+    case SDL_SCANCODE_Q:
+        return SDL_APP_SUCCESS;
+
+        // Movement keys for the player
+    case SDL_SCANCODE_RIGHT:
+    case SDL_SCANCODE_LEFT:
+        move_player(player, key_code);
+        break;
+    default:
+        break;
+    }
+
+    return SDL_APP_CONTINUE;
 }
 
 /* This function runs when a new event (mouse input, keypresses, etc) occurs. */
 SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 {
-    if (event->type == SDL_EVENT_QUIT) {
+    Player* player = &((AppState*)appstate)->player;
+    switch (event->type) {
+    case SDL_EVENT_QUIT:
         return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
+    case SDL_EVENT_KEY_DOWN:
+        return handle_key_event_(player, event->key.scancode);
+    default:
+        break;
     }
+
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
 /* This function runs once per frame, and is the heart of the program. */
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
+    // Get pointers to app state
+    AppState* as = (AppState*)appstate;
+    Player* player = &as->player;
+
     const double now = ((double)SDL_GetTicks()) / 1000.0;  /* convert from milliseconds to seconds. */
     /* choose the color for the frame we will draw. The sine wave trick makes it fade between colors smoothly. */
     const float red = (float)(0.5 + 0.5 * SDL_sin(now));
