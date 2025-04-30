@@ -20,7 +20,7 @@ static SDL_Renderer* renderer = NULL;
 #define FRAMES_PER_SECOND 60
 #define STEP_RATE_IN_MILLISECONDS (1.0/ FRAMES_PER_SECOND) * 1000
 #define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
+#define SCREEN_HEIGHT 720
 
 #define PLAYER_SPAWN_X 100.0
 #define PLAYER_SPAWN_Y 100.0
@@ -81,12 +81,18 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 }
 
 void move_player(Player* player, SDL_Scancode key_code) {
+    int LEFT_MAX = -10;
+    int RIGHT_MAX = 10;
     switch (key_code) {
     case SDL_SCANCODE_LEFT:
-        player->vel_x = -10;
+        if (player->vel_x >= LEFT_MAX) {
+            player->vel_x -= 2;
+        }
         break;
     case SDL_SCANCODE_RIGHT:
-        player->vel_x = 10;
+        if (player->vel_x <= RIGHT_MAX) {
+            player->vel_x += 2;
+        }
         break;
     default:
         break;

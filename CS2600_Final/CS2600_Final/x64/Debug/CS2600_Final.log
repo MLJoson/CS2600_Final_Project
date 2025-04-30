@@ -1,2 +1,5 @@
-﻿  testMain.c
-  CS2600_Final.vcxproj -> C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\x64\Debug\CS2600_Final.exe
+﻿  main.c
+C:\Users\littl\OneDrive\Desktop\Program Projects\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(141,32): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+C:\Users\littl\OneDrive\Desktop\Program Projects\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(158,35): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\littl\OneDrive\Desktop\Program Projects\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(173,26): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
+  CS2600_Final.vcxproj -> C:\Users\littl\OneDrive\Desktop\Program Projects\CS2600_Final_Project\CS2600_Final\x64\Debug\CS2600_Final.exe
