@@ -1,14 +1,14 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\lazer\\OneDrive\\Documents\\GitHub\\CS2600_Final_Project\\CS2600_Final\\",
+  "WorkspaceRootPath": "R:\\Github\\CS2600_Final_Project\\CS2600_Final\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{05D8BFC5-D48F-4F2B-954A-799057DAA1C4}|CS2600_Final\\CS2600_Final.vcxproj|C:\\Users\\lazer\\OneDrive\\Documents\\GitHub\\CS2600_Final_Project\\CS2600_Final\\CS2600_Final\\testMain.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{05D8BFC5-D48F-4F2B-954A-799057DAA1C4}|CS2600_Final\\CS2600_Final.vcxproj|solutionrelative:CS2600_Final\\testMain.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{05D8BFC5-D48F-4F2B-954A-799057DAA1C4}|CS2600_Final\\CS2600_Final.vcxproj|R:\\Github\\CS2600_Final_Project\\CS2600_Final\\CS2600_Final\\main.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{05D8BFC5-D48F-4F2B-954A-799057DAA1C4}|CS2600_Final\\CS2600_Final.vcxproj|solutionrelative:CS2600_Final\\main.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{05D8BFC5-D48F-4F2B-954A-799057DAA1C4}|CS2600_Final\\CS2600_Final.vcxproj|C:\\Users\\lazer\\OneDrive\\Documents\\GitHub\\CS2600_Final_Project\\CS2600_Final\\CS2600_Final\\main.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{05D8BFC5-D48F-4F2B-954A-799057DAA1C4}|CS2600_Final\\CS2600_Final.vcxproj|solutionrelative:CS2600_Final\\main.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{05D8BFC5-D48F-4F2B-954A-799057DAA1C4}|CS2600_Final\\CS2600_Final.vcxproj|R:\\Github\\CS2600_Final_Project\\CS2600_Final\\CS2600_Final\\testMain.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{05D8BFC5-D48F-4F2B-954A-799057DAA1C4}|CS2600_Final\\CS2600_Final.vcxproj|solutionrelative:CS2600_Final\\testMain.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,30 +18,29 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "testMain.c",
-              "DocumentMoniker": "C:\\Users\\lazer\\OneDrive\\Documents\\GitHub\\CS2600_Final_Project\\CS2600_Final\\CS2600_Final\\testMain.c",
+              "DocumentMoniker": "R:\\Github\\CS2600_Final_Project\\CS2600_Final\\CS2600_Final\\testMain.c",
               "RelativeDocumentMoniker": "CS2600_Final\\testMain.c",
-              "ToolTip": "C:\\Users\\lazer\\OneDrive\\Documents\\GitHub\\CS2600_Final_Project\\CS2600_Final\\CS2600_Final\\testMain.c",
+              "ToolTip": "R:\\Github\\CS2600_Final_Project\\CS2600_Final\\CS2600_Final\\testMain.c",
               "RelativeToolTip": "CS2600_Final\\testMain.c",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAABkAAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAAB8AAAACAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
-              "WhenOpened": "2025-04-29T17:02:52.943Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-29T17:02:52.943Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "main.c",
-              "DocumentMoniker": "C:\\Users\\lazer\\OneDrive\\Documents\\GitHub\\CS2600_Final_Project\\CS2600_Final\\CS2600_Final\\main.c",
+              "DocumentMoniker": "R:\\Github\\CS2600_Final_Project\\CS2600_Final\\CS2600_Final\\main.c",
               "RelativeDocumentMoniker": "CS2600_Final\\main.c",
-              "ToolTip": "C:\\Users\\lazer\\OneDrive\\Documents\\GitHub\\CS2600_Final_Project\\CS2600_Final\\CS2600_Final\\main.c",
+              "ToolTip": "R:\\Github\\CS2600_Final_Project\\CS2600_Final\\CS2600_Final\\main.c",
               "RelativeToolTip": "CS2600_Final\\main.c",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAABMAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAIgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
               "WhenOpened": "2025-04-29T00:32:00.497Z",
               "EditorCaption": ""

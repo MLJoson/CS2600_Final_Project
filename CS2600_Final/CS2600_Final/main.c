@@ -17,25 +17,38 @@ static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
 
 /* Constants */
-#define PLAYER_SPAWN_X 100
-#define PLAYER_SPAWN_Y 100
+#define FRAMES_PER_SECOND 60
+#define STEP_RATE_IN_MILLISECONDS (1.0/ FRAMES_PER_SECOND) * 1000
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
+
+#define PLAYER_SPAWN_X 100.0
+#define PLAYER_SPAWN_Y 100.0
+#define PLAYER_JUMP_HEIGHT 75.0
+#define GRAVITY 1.5
+
+
 
 /* Player */
 typedef struct {
-    int x;
-    int y;
-    int vel_y;
+    float x;
+    float y;
+    float vel_y;
+    float vel_x;
 } Player;
 
 /* App State (holding variables between frames) */
 typedef struct {
     Player player;
+    int last_step;
 } AppState;
 
 /* Initializes the player on startup or restart */
 void initialize_player(Player* player) {
     player->x = PLAYER_SPAWN_X;
     player->y = PLAYER_SPAWN_Y;
+    player->vel_y = 0.0;
+    player->vel_x = 0.0;
 }
 
 /* This function runs once at startup. */
@@ -54,7 +67,9 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
         return SDL_APP_FAILURE;
     }
 
-    if (!SDL_CreateWindowAndRenderer("examples/renderer/clear", 640, 480, 0, &window, &renderer)) {
+    *appstate = as;
+
+    if (!SDL_CreateWindowAndRenderer("examples/renderer/clear", SCREEN_WIDTH, SCREEN_HEIGHT, 0, &window, &renderer)) {
         SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
@@ -66,7 +81,16 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 }
 
 void move_player(Player* player, SDL_Scancode key_code) {
-    // TODO: Implement moving
+    switch (key_code) {
+    case SDL_SCANCODE_LEFT:
+        player->vel_x = -10;
+        break;
+    case SDL_SCANCODE_RIGHT:
+        player->vel_x = 10;
+        break;
+    default:
+        break;
+    }
 }
 
 static SDL_AppResult handle_key_event_(Player* player, SDL_Scancode key_code) {
@@ -103,6 +127,31 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
+void update_player(Player* player) {
+    // Adds gravity to y-velocity
+    player->vel_y += GRAVITY;
+
+    // Applies y-velocity to y-position
+    player->y += player->vel_y * 0.1;
+    if (player->y >= SCREEN_HEIGHT - 10) {
+        player->vel_y = -PLAYER_JUMP_HEIGHT * GRAVITY;
+    }
+
+    // Applies x-velocity to x-position
+    player->x += player->vel_x;
+
+    // Wrap the player position around the borders
+    int leftBorder = -20;
+    int rightBorder = SCREEN_WIDTH + 20;
+    if (player->x < leftBorder)
+        player->x = rightBorder + (player->x - leftBorder);
+    else if (player->x > rightBorder)
+        player->x = leftBorder + (player->x - rightBorder);
+
+    // Dampens x-velocity
+    player->vel_x = player->vel_x * 0.9;
+}
+
 /* This function runs once per frame, and is the heart of the program. */
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
@@ -110,6 +159,16 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     AppState* as = (AppState*)appstate;
     Player* player = &as->player;
 
+    SDL_FRect r;
+
+    // Update player position / velocity
+    while ((SDL_GetTicks() - as->last_step) >= STEP_RATE_IN_MILLISECONDS) {
+        update_player(player);
+        as->last_step += STEP_RATE_IN_MILLISECONDS;
+    }
+
+
+    // Background color stuff
     const double now = ((double)SDL_GetTicks()) / 1000.0;  /* convert from milliseconds to seconds. */
     /* choose the color for the frame we will draw. The sine wave trick makes it fade between colors smoothly. */
     const float red = (float)(0.5 + 0.5 * SDL_sin(now));
@@ -119,6 +178,14 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 
     /* clear the window to the draw color. */
     SDL_RenderClear(renderer);
+
+    // Draw the player
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+    r.x = player->x;
+    r.y = player->y;
+    r.w = r.h = 50;
+
+    SDL_RenderFillRect(renderer, &r);
 
     /* put the newly-cleared rendering on the screen. */
     SDL_RenderPresent(renderer);
