@@ -24,9 +24,9 @@ static SDL_Renderer* renderer = NULL;
 
 #define PLAYER_SPAWN_X SCREEN_WIDTH / 2
 #define PLAYER_SPAWN_Y SCREEN_HEIGHT / 2
-#define PLAYER_JUMP_HEIGHT 75.0
+#define PLAYER_JUMP_HEIGHT 50.0
 #define PLAYER_SIZE 50
-#define GRAVITY 1.5
+#define GRAVITY 3
 
 /* Player */
 typedef struct {
@@ -137,18 +137,26 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 }
 
 void move_player(Player* player) {
+    // Max velocities
     int LEFT_MAX = -10;
     int RIGHT_MAX = 10;
 
+    // If player is holding left and right
     if (player->holdRight && player->holdLeft)
         return;
+
+    // If player is holding only right
     else if (player->holdRight) {
         if (player->vel_x <= RIGHT_MAX) {
+            // Ramps up velocity to the right
             player->vel_x += 2;
         }
     }
+
+    // If player is holding only left
     else if (player->holdLeft) {
         if (player->vel_x >= LEFT_MAX) {
+            // Ramps up velocity to the left
             player->vel_x -= 2;
         }
     }
@@ -171,7 +179,7 @@ void update_player(Player* player) {
     player->x += player->vel_x;
 
     // Wrap the player position around the borders
-    int leftBorder = -20;
+    int leftBorder = -40;
     int rightBorder = SCREEN_WIDTH + 20;
     if (player->x < leftBorder)
         player->x = rightBorder + (player->x - leftBorder);
@@ -196,7 +204,6 @@ SDL_AppResult SDL_AppIterate(void* appstate)
         update_player(player);
         as->last_step += STEP_RATE_IN_MILLISECONDS;
     }
-
 
     // Background color stuff
     const double now = ((double)SDL_GetTicks()) / 1000.0;  /* convert from milliseconds to seconds. */
