@@ -1,8 +1,9 @@
 /*
- * 
+ * Marco Joson
+ * Chelsea Kathleen Ocampo
+ * Lucia Maturino Iniguez
+ * Ethan Nhan
  * Branden Romero
- * 
- * 
  */
 
 /* clear.c ... * /
