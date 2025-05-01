@@ -22,12 +22,11 @@ static SDL_Renderer* renderer = NULL;
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 720
 
-#define PLAYER_SPAWN_X 100.0
-#define PLAYER_SPAWN_Y 100.0
+#define PLAYER_SPAWN_X SCREEN_WIDTH / 2
+#define PLAYER_SPAWN_Y SCREEN_HEIGHT / 2
 #define PLAYER_JUMP_HEIGHT 75.0
+#define PLAYER_SIZE 50
 #define GRAVITY 1.5
-
-
 
 /* Player */
 typedef struct {
@@ -35,6 +34,10 @@ typedef struct {
     float y;
     float vel_y;
     float vel_x;
+
+    // For key handling
+    bool holdRight;
+    bool holdLeft;
 } Player;
 
 /* App State (holding variables between frames) */
@@ -80,38 +83,37 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
-void move_player(Player* player, SDL_Scancode key_code) {
-    int LEFT_MAX = -10;
-    int RIGHT_MAX = 10;
-    switch (key_code) {
-    case SDL_SCANCODE_LEFT:
-        if (player->vel_x >= LEFT_MAX) {
-            player->vel_x -= 2;
+/* Key handling */
+static SDL_AppResult handle_key_event_(Player* player, SDL_Event* event) {
+    if (event->type == SDL_EVENT_KEY_DOWN) {
+        switch (event->key.scancode) {
+            // Pressing Q quits the game
+        case SDL_SCANCODE_Q:
+            return SDL_APP_SUCCESS;
+
+            // Movement keys for the player
+        case SDL_SCANCODE_RIGHT:
+            player->holdRight = true;
+            break;
+        case SDL_SCANCODE_LEFT:
+            player->holdLeft = true;
+            break;
+        default:
+            break;
         }
-        break;
-    case SDL_SCANCODE_RIGHT:
-        if (player->vel_x <= RIGHT_MAX) {
-            player->vel_x += 2;
-        }
-        break;
-    default:
-        break;
     }
-}
-
-static SDL_AppResult handle_key_event_(Player* player, SDL_Scancode key_code) {
-    switch (key_code) {
-        // Pressing Q quits the game
-    case SDL_SCANCODE_Q:
-        return SDL_APP_SUCCESS;
-
-        // Movement keys for the player
-    case SDL_SCANCODE_RIGHT:
-    case SDL_SCANCODE_LEFT:
-        move_player(player, key_code);
-        break;
-    default:
-        break;
+    else if (event->type == SDL_EVENT_KEY_UP) {
+        switch (event->key.scancode) {
+            // Movement keys for the player
+        case SDL_SCANCODE_RIGHT:
+            player->holdRight = false;
+            break;
+        case SDL_SCANCODE_LEFT:
+            player->holdLeft = false;
+            break;
+        default:
+            break;
+        }
     }
 
     return SDL_APP_CONTINUE;
@@ -124,8 +126,9 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
     switch (event->type) {
     case SDL_EVENT_QUIT:
         return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
+    case SDL_EVENT_KEY_UP:
     case SDL_EVENT_KEY_DOWN:
-        return handle_key_event_(player, event->key.scancode);
+        return handle_key_event_(player, event);
     default:
         break;
     }
@@ -133,13 +136,34 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
+void move_player(Player* player) {
+    int LEFT_MAX = -10;
+    int RIGHT_MAX = 10;
+
+    if (player->holdRight && player->holdLeft)
+        return;
+    else if (player->holdRight) {
+        if (player->vel_x <= RIGHT_MAX) {
+            player->vel_x += 2;
+        }
+    }
+    else if (player->holdLeft) {
+        if (player->vel_x >= LEFT_MAX) {
+            player->vel_x -= 2;
+        }
+    }
+}
+
 void update_player(Player* player) {
     // Adds gravity to y-velocity
     player->vel_y += GRAVITY;
 
+    // Apply movement input to x-velocity
+    move_player(player);
+
     // Applies y-velocity to y-position
     player->y += player->vel_y * 0.1;
-    if (player->y >= SCREEN_HEIGHT - 10) {
+    if (player->y >= (SCREEN_HEIGHT - PLAYER_SIZE)) {
         player->vel_y = -PLAYER_JUMP_HEIGHT * GRAVITY;
     }
 
@@ -189,7 +213,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
     r.x = player->x;
     r.y = player->y;
-    r.w = r.h = 50;
+    r.w = r.h = PLAYER_SIZE;
 
     SDL_RenderFillRect(renderer, &r);
 
