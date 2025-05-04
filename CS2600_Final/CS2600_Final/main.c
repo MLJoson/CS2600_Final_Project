@@ -36,6 +36,8 @@ static SDL_Renderer* renderer = NULL;
 #define PLAYER_SIZE 50
 #define GRAVITY 3
 
+#define MAX_PLATFORMS 10
+
 /* Player */
 typedef struct {
     float x;
@@ -54,12 +56,29 @@ typedef struct {
     int last_step;
 } AppState;
 
+/*Platforms*/
+typedef struct {
+    float x, y;
+    float width, height;
+} Platform;
+
 /* Initializes the player on startup or restart */
 void initialize_player(Player* player) {
     player->x = PLAYER_SPAWN_X;
     player->y = PLAYER_SPAWN_Y;
     player->vel_y = 0.0;
     player->vel_x = 0.0;
+}
+
+/* Initialize the platforms on startup */
+Platform platforms[MAX_PLATFORMS];
+void initialize_platforms(Platform platforms[]) {
+    for (int i = 0; i < MAX_PLATFORMS; i++){
+        platforms[i].x = rand() % (SCREEN_WIDTH - 60);
+        platforms[i].y = i * 70; //to space them out
+        platforms[i].width = 60;
+        platforms[i].height = 10;
+    }
 }
 
 /* This function runs once at startup. */
@@ -88,6 +107,8 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
     // Initialize player
     initialize_player(&as->player);
 
+    // Initialize platform
+    initialize_platforms(platforms);
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
@@ -196,6 +217,42 @@ void update_player(Player* player) {
 
     // Dampens x-velocity
     player->vel_x = player->vel_x * 0.9;
+
+    /*platform interaction code
+    Explaination: the player must bounce off the platfrom from ABOVE
+    (so the player can enter from under.*/
+    for (int i = 0; i < MAX_PLATFORMS; i++) {
+        Platform p = platforms[i];
+        if (player->vel_y > 0 && 
+            player->x + PLAYER_SIZE > p.x &&
+            player->x < p.x + p.width &&
+            player->y + PLAYER_SIZE >= p.y &&
+            player->y + PLAYER_SIZE <= p.y + p.height) {
+
+            player->vel_y = -PLAYER_JUMP_HEIGHT * GRAVITY;
+        }
+    }
+
+    /* Use the player reaching the halfway point to move the platforms down
+    to give the illusion of bouncing upwards*/
+    if (player->y < SCREEN_HEIGHT / 2) {
+        float move_down = (SCREEN_HEIGHT / 2) - player->y;
+        player->y = (SCREEN_HEIGHT / 2);
+
+        //move the platforms down
+        for (int i = 0; i < MAX_PLATFORMS; i++) {
+            platforms[i].y += move_down;
+        }
+    }
+
+    //platform reset code
+    for (int i = 0; i < MAX_PLATFORMS; i++) {
+        if (platforms[i].y > SCREEN_HEIGHT + 10)
+        {
+            platforms[i].y = -10;
+            platforms[i].x = (float)(rand() % (SCREEN_WIDTH - (int)platforms[i].width));
+        }
+    }
 }
 
 /* This function runs once per frame, and is the heart of the program. */
@@ -225,10 +282,22 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     SDL_RenderClear(renderer);
 
     // Draw the player
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE); // black
     r.x = player->x;
     r.y = player->y;
     r.w = r.h = PLAYER_SIZE;
+
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  // white
+    //Draw the platforms
+    for (int i = 0; i < MAX_PLATFORMS; ++i) {
+        SDL_FRect plat_rect = {
+            platforms[i].x, platforms[i].y,
+            platforms[i].width, platforms[i].height
+        };
+        SDL_RenderFillRect(renderer, &plat_rect);
+    }
+
 
     SDL_RenderFillRect(renderer, &r);
 
