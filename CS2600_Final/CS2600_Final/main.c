@@ -76,7 +76,7 @@ void initialize_platforms(Platform platforms[]) {
     for (int i = 0; i < MAX_PLATFORMS; i++){
         platforms[i].x = rand() % (SCREEN_WIDTH - 60);
         platforms[i].y = i * 70; //to space them out
-        platforms[i].width = 60;
+        platforms[i].width = 80;
         platforms[i].height = 10;
     }
 }
