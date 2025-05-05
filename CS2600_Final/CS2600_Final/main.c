@@ -6,21 +6,21 @@
  * Branden Romero
  */
 
-/* clear.c ... * /
+ /* clear.c ... * /
 
-/*
- * This example code creates an SDL window and renderer, and then clears the
- * window to a different color every frame, so you'll effectively get a window
- * that's smoothly fading between colors.
- *
- * This code is public domain. Feel free to use it for any purpose!
- */
+ /*
+  * This example code creates an SDL window and renderer, and then clears the
+  * window to a different color every frame, so you'll effectively get a window
+  * that's smoothly fading between colors.
+  *
+  * This code is public domain. Feel free to use it for any purpose!
+  */
 
 #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
- /* We will use this renderer to draw into this window every frame. */
+  /* We will use this renderer to draw into this window every frame. */
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
 
@@ -37,6 +37,8 @@ static SDL_Renderer* renderer = NULL;
 #define GRAVITY 3
 
 #define MAX_PLATFORMS 10
+#define PLATFORM_HEIGHT 10
+#define PLATFORM_WIDTH 80
 
 /* Player */
 typedef struct {
@@ -64,21 +66,24 @@ typedef struct {
 
 /* Initializes the player on startup or restart */
 void initialize_player(Player* player) {
-    player->x = PLAYER_SPAWN_X;
+    player->x = PLAYER_SPAWN_X - (PLAYER_SIZE / 2);
     player->y = PLAYER_SPAWN_Y;
     player->vel_y = 0.0;
     player->vel_x = 0.0;
 }
 
-/* Initialize the platforms on startup */
+/* Initialize the platforms on startup or restart */
 Platform platforms[MAX_PLATFORMS];
 void initialize_platforms(Platform platforms[]) {
-    for (int i = 0; i < MAX_PLATFORMS; i++){
+    for (int i = 0; i < MAX_PLATFORMS; i++) {
         platforms[i].x = rand() % (SCREEN_WIDTH - 60);
         platforms[i].y = i * 70; //to space them out
-        platforms[i].width = 60;
-        platforms[i].height = 10;
+        platforms[i].width = PLATFORM_WIDTH;
+        platforms[i].height = PLATFORM_HEIGHT;
     }
+
+    // Make sure there is a platform to catch the player
+    platforms[MAX_PLATFORMS - 1].x = (SCREEN_WIDTH / 2) - (PLATFORM_WIDTH / 2);
 }
 
 /* This function runs once at startup. */
@@ -165,6 +170,7 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
+/* Updates player's x-velocity with input */
 void move_player(Player* player) {
     // Max velocities
     int LEFT_MAX = -10;
@@ -191,6 +197,13 @@ void move_player(Player* player) {
     }
 }
 
+/* Handles resetting the game */
+void reset_game(Player* player) {
+    initialize_player(player);
+    initialize_platforms(platforms);
+}
+
+/* Updates players position and velocity*/
 void update_player(Player* player) {
     // Adds gravity to y-velocity
     player->vel_y += GRAVITY;
@@ -200,9 +213,6 @@ void update_player(Player* player) {
 
     // Applies y-velocity to y-position
     player->y += player->vel_y * 0.1;
-    if (player->y >= (SCREEN_HEIGHT - PLAYER_SIZE)) {
-        player->vel_y = -PLAYER_JUMP_HEIGHT * GRAVITY;
-    }
 
     // Applies x-velocity to x-position
     player->x += player->vel_x;
@@ -218,17 +228,18 @@ void update_player(Player* player) {
     // Dampens x-velocity
     player->vel_x = player->vel_x * 0.9;
 
-    /*platform interaction code
+    /* platform interaction code
     Explaination: the player must bounce off the platfrom from ABOVE
-    (so the player can enter from under.*/
+    (so the player can enter from under.)*/
     for (int i = 0; i < MAX_PLATFORMS; i++) {
         Platform p = platforms[i];
-        if (player->vel_y > 0 && 
+        if (player->vel_y > 0 &&
             player->x + PLAYER_SIZE > p.x &&
             player->x < p.x + p.width &&
             player->y + PLAYER_SIZE >= p.y &&
             player->y + PLAYER_SIZE <= p.y + p.height) {
 
+            player->y = p.y - PLAYER_SIZE; // Fixes player clipping into platform
             player->vel_y = -PLAYER_JUMP_HEIGHT * GRAVITY;
         }
     }
@@ -253,6 +264,10 @@ void update_player(Player* player) {
             platforms[i].x = (float)(rand() % (SCREEN_WIDTH - (int)platforms[i].width));
         }
     }
+
+    // Check for player death
+    if (player->y > SCREEN_HEIGHT)
+        reset_game(player);
 }
 
 /* This function runs once per frame, and is the heart of the program. */
@@ -281,15 +296,9 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     /* clear the window to the draw color. */
     SDL_RenderClear(renderer);
 
-    // Draw the player
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE); // black
-    r.x = player->x;
-    r.y = player->y;
-    r.w = r.h = PLAYER_SIZE;
-
-
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  // white
     //Draw the platforms
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  // white
+
     for (int i = 0; i < MAX_PLATFORMS; ++i) {
         SDL_FRect plat_rect = {
             platforms[i].x, platforms[i].y,
@@ -298,6 +307,11 @@ SDL_AppResult SDL_AppIterate(void* appstate)
         SDL_RenderFillRect(renderer, &plat_rect);
     }
 
+    // Draw the player
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE); // black
+    r.x = player->x;
+    r.y = player->y;
+    r.w = r.h = PLAYER_SIZE;
 
     SDL_RenderFillRect(renderer, &r);
 
@@ -311,6 +325,12 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 void SDL_AppQuit(void* appstate, SDL_AppResult result)
 {
     /* SDL will clean up the window/renderer for us. */
+
+    // Free appstate
+    if (appstate != NULL) {
+        AppState* as = (AppState*)appstate;
+        SDL_free(as);
+    }
 }
 
 
