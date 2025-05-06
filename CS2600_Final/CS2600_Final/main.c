@@ -52,10 +52,17 @@ typedef struct {
     bool holdLeft;
 } Player;
 
+/* Game State (in menu, game, or end screen) */
+typedef enum {
+    main_menu,
+    game,
+    retry_menu
+} GameState;
 /* App State (holding variables between frames) */
 typedef struct {
     Player player;
     int last_step;
+    GameState game_state;
 } AppState;
 
 /*Platforms*/
@@ -63,6 +70,26 @@ typedef struct {
     float x, y;
     float width, height;
 } Platform;
+
+
+
+/*Play Button*/
+typedef struct {
+    float x, y;
+    float len, width;
+
+    char text[8];
+} Play_Button;
+
+/*Quit Button*/
+typedef struct {
+    float x, y;
+    float len, width;
+
+    char text[8];
+} Quit_Button;
+
+/*Options Button*/
 
 /* Initializes the player on startup or restart */
 void initialize_player(Player* player) {
@@ -84,6 +111,25 @@ void initialize_platforms(Platform platforms[]) {
 
     // Make sure there is a platform to catch the player
     platforms[MAX_PLATFORMS - 1].x = (SCREEN_WIDTH / 2) - (PLATFORM_WIDTH / 2);
+}
+
+Play_Button start_button;
+Play_Button retry_button;
+void initialize_play_button(Play_Button *button, float x, float y, float len, float width, char *text) {
+    button->x = x;
+    button->y = y;
+    button->len = len;
+    button->width = width;
+    strcpy_s(button->text, sizeof(button->text), text);
+}
+
+Quit_Button quit_button;
+void initialize_quit_button(Play_Button* button, float x, float y, float len, float width, char* text) {
+    button->x = x;
+    button->y = y;
+    button->len = len;
+    button->width = width;
+    strcpy_s(button->text, sizeof(button->text), text);
 }
 
 /* This function runs once at startup. */
@@ -109,11 +155,19 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
         return SDL_APP_FAILURE;
     }
 
+    as->game_state = main_menu;
+
     // Initialize player
     initialize_player(&as->player);
 
     // Initialize platform
     initialize_platforms(platforms);
+
+    //Initialize buttons
+    initialize_play_button(&start_button, 220, 450, 200, 80, "Play!");
+    initialize_play_button(&retry_button, 220, 300, 200, 80, "Retry");
+
+    initialize_quit_button(&quit_button, 220, 570, 200, 80, "Quit");
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
@@ -268,6 +322,7 @@ void update_player(Player* player) {
     // Check for player death
     if (player->y > SCREEN_HEIGHT)
         reset_game(player);
+    
 }
 
 /* This function runs once per frame, and is the heart of the program. */
@@ -285,6 +340,22 @@ SDL_AppResult SDL_AppIterate(void* appstate)
         as->last_step += STEP_RATE_IN_MILLISECONDS;
     }
 
+    if (as->game_state == main_menu) {
+        SDL_SetRenderDrawColor(renderer, 100, 100, 255, SDL_ALPHA_OPAQUE);
+        SDL_RenderClear(renderer);
+
+        SDL_FRect play_rect = { start_button.x, start_button.y, start_button.len, start_button.width };
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
+        SDL_RenderFillRect(renderer, &play_rect);
+
+        SDL_FRect quit_rect = { quit_button.x, quit_button.y, quit_button.len, quit_button.width };
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+        SDL_RenderFillRect(renderer, &quit_rect);
+
+        SDL_RenderPresent(renderer);
+        return SDL_APP_CONTINUE;
+    }
+
     // Background color stuff
     const double now = ((double)SDL_GetTicks()) / 1000.0;  /* convert from milliseconds to seconds. */
     /* choose the color for the frame we will draw. The sine wave trick makes it fade between colors smoothly. */
@@ -295,6 +366,8 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 
     /* clear the window to the draw color. */
     SDL_RenderClear(renderer);
+
+
 
     //Draw the platforms
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  // white
