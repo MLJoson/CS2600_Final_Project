@@ -210,8 +210,27 @@ static SDL_AppResult handle_key_event_(Player* player, SDL_Event* event) {
 /* This function runs when a new event (mouse input, keypresses, etc) occurs. */
 SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 {
+    AppState* as = (AppState*)appstate;
     Player* player = &((AppState*)appstate)->player;
     switch (event->type) {
+    case SDL_EVENT_MOUSE_BUTTON_DOWN: {
+        float mouse_x = event->button.x;
+        float mouse_y = event->button.y;
+
+        if (as->game_state == main_menu) {
+            SDL_FRect play_rect = { start_button.x, start_button.y, start_button.len, start_button.width };
+            SDL_FRect quit_rect = { quit_button.x, quit_button.y, quit_button.len, quit_button.width };
+        
+            if (SDL_PointInRectFloat(&(SDL_FPoint) { mouse_x, mouse_y }, & play_rect)) {
+                as->game_state = game;
+            }
+            else if (SDL_PointInRectFloat(&(SDL_FPoint) { mouse_x, mouse_y }, & quit_rect)) {
+                return SDL_APP_SUCCESS;
+            }
+        
+        }
+        break;
+    }
     case SDL_EVENT_QUIT:
         return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
     case SDL_EVENT_KEY_UP:
@@ -356,40 +375,42 @@ SDL_AppResult SDL_AppIterate(void* appstate)
         return SDL_APP_CONTINUE;
     }
 
-    // Background color stuff
-    const double now = ((double)SDL_GetTicks()) / 1000.0;  /* convert from milliseconds to seconds. */
-    /* choose the color for the frame we will draw. The sine wave trick makes it fade between colors smoothly. */
-    const float red = (float)(0.5 + 0.5 * SDL_sin(now));
-    const float green = (float)(0.5 + 0.5 * SDL_sin(now + SDL_PI_D * 2 / 3));
-    const float blue = (float)(0.5 + 0.5 * SDL_sin(now + SDL_PI_D * 4 / 3));
-    SDL_SetRenderDrawColorFloat(renderer, red, green, blue, SDL_ALPHA_OPAQUE_FLOAT);  /* new color, full alpha. */
+    if (as->game_state == game) {
+        // Background color stuff
+        const double now = ((double)SDL_GetTicks()) / 1000.0;  /* convert from milliseconds to seconds. */
+        /* choose the color for the frame we will draw. The sine wave trick makes it fade between colors smoothly. */
+        const float red = (float)(0.5 + 0.5 * SDL_sin(now));
+        const float green = (float)(0.5 + 0.5 * SDL_sin(now + SDL_PI_D * 2 / 3));
+        const float blue = (float)(0.5 + 0.5 * SDL_sin(now + SDL_PI_D * 4 / 3));
+        SDL_SetRenderDrawColorFloat(renderer, red, green, blue, SDL_ALPHA_OPAQUE_FLOAT);  /* new color, full alpha. */
 
-    /* clear the window to the draw color. */
-    SDL_RenderClear(renderer);
+        /* clear the window to the draw color. */
+        SDL_RenderClear(renderer);
 
 
 
-    //Draw the platforms
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  // white
+        //Draw the platforms
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  // white
 
-    for (int i = 0; i < MAX_PLATFORMS; ++i) {
-        SDL_FRect plat_rect = {
-            platforms[i].x, platforms[i].y,
-            platforms[i].width, platforms[i].height
-        };
-        SDL_RenderFillRect(renderer, &plat_rect);
+        for (int i = 0; i < MAX_PLATFORMS; ++i) {
+            SDL_FRect plat_rect = {
+                platforms[i].x, platforms[i].y,
+                platforms[i].width, platforms[i].height
+            };
+            SDL_RenderFillRect(renderer, &plat_rect);
+        }
+
+        // Draw the player
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE); // black
+        r.x = player->x;
+        r.y = player->y;
+        r.w = r.h = PLAYER_SIZE;
+
+        SDL_RenderFillRect(renderer, &r);
+
+        /* put the newly-cleared rendering on the screen. */
+        SDL_RenderPresent(renderer);
     }
-
-    // Draw the player
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE); // black
-    r.x = player->x;
-    r.y = player->y;
-    r.w = r.h = PLAYER_SIZE;
-
-    SDL_RenderFillRect(renderer, &r);
-
-    /* put the newly-cleared rendering on the screen. */
-    SDL_RenderPresent(renderer);
 
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
