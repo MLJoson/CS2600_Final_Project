@@ -3,7 +3,8 @@ C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS260
 C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(106,33): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
 C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(107,28): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
 C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(170,28): warning C4133: 'function': incompatible types - from 'Quit_Button *' to 'Play_Button *'
-C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(288,32): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(302,35): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(359,26): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
+C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(300,32): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(314,35): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(379,26): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
+C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(398,32): warning C4554: '|': check operator precedence for possible error; use parentheses to clarify precedence
   CS2600_Final.vcxproj -> C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\x64\Debug\CS2600_Final.exe

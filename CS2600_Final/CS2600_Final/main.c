@@ -165,7 +165,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 
     //Initialize buttons
     initialize_play_button(&start_button, 220, 450, 200, 80, "Play!");
-    initialize_play_button(&retry_button, 220, 300, 200, 80, "Retry");
+    initialize_play_button(&retry_button, 220, 450, 200, 80, "Retry");
 
     initialize_quit_button(&quit_button, 220, 570, 200, 80, "Quit");
     return SDL_APP_CONTINUE;  /* carry on with the program! */
@@ -207,6 +207,12 @@ static SDL_AppResult handle_key_event_(Player* player, SDL_Event* event) {
     return SDL_APP_CONTINUE;
 }
 
+/* Handles resetting the game */
+void reset_game(Player* player) {
+    initialize_player(player);
+    initialize_platforms(platforms);
+}
+
 /* This function runs when a new event (mouse input, keypresses, etc) occurs. */
 SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 {
@@ -227,7 +233,19 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
             else if (SDL_PointInRectFloat(&(SDL_FPoint) { mouse_x, mouse_y }, & quit_rect)) {
                 return SDL_APP_SUCCESS;
             }
-        
+        }
+
+        if (as->game_state == retry_menu) {
+            SDL_FRect retry_rect = { retry_button.x, retry_button.y, retry_button.len, retry_button.width };
+            SDL_FRect quit_rect = { quit_button.x, quit_button.y, quit_button.len, quit_button.width };
+
+            if (SDL_PointInRectFloat(&(SDL_FPoint) { mouse_x, mouse_y }, & retry_rect)) {
+                as->game_state = game;
+                reset_game(player);
+            }
+            else if (SDL_PointInRectFloat(&(SDL_FPoint) { mouse_x, mouse_y }, & quit_rect)) {
+                return SDL_APP_SUCCESS;
+            }
         }
         break;
     }
@@ -270,14 +288,8 @@ void move_player(Player* player) {
     }
 }
 
-/* Handles resetting the game */
-void reset_game(Player* player) {
-    initialize_player(player);
-    initialize_platforms(platforms);
-}
-
 /* Updates players position and velocity*/
-void update_player(Player* player) {
+void update_player(Player* player, AppState* as) {
     // Adds gravity to y-velocity
     player->vel_y += GRAVITY;
 
@@ -339,8 +351,11 @@ void update_player(Player* player) {
     }
 
     // Check for player death
-    if (player->y > SCREEN_HEIGHT)
-        reset_game(player);
+    if (player->y > SCREEN_HEIGHT) {
+        as->game_state = retry_menu;
+    }
+
+        
     
 }
 
@@ -353,9 +368,14 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 
     SDL_FRect r;
 
+    double now = 0.0;
+    float red = 0.0;
+    float green = 0.0;
+    float blue = 0.0;
+
     // Update player position / velocity
     while ((SDL_GetTicks() - as->last_step) >= STEP_RATE_IN_MILLISECONDS) {
-        update_player(player);
+        update_player(player, as);
         as->last_step += STEP_RATE_IN_MILLISECONDS;
     }
 
@@ -375,13 +395,17 @@ SDL_AppResult SDL_AppIterate(void* appstate)
         return SDL_APP_CONTINUE;
     }
 
-    if (as->game_state == game) {
-        // Background color stuff
-        const double now = ((double)SDL_GetTicks()) / 1000.0;  /* convert from milliseconds to seconds. */
-        /* choose the color for the frame we will draw. The sine wave trick makes it fade between colors smoothly. */
-        const float red = (float)(0.5 + 0.5 * SDL_sin(now));
-        const float green = (float)(0.5 + 0.5 * SDL_sin(now + SDL_PI_D * 2 / 3));
-        const float blue = (float)(0.5 + 0.5 * SDL_sin(now + SDL_PI_D * 4 / 3));
+    if (as->game_state == game | as->game_state == retry_menu) {
+        
+        if (as->game_state == game) {
+            // Background color stuff
+            now = ((double)SDL_GetTicks()) / 1000.0;  /* convert from milliseconds to seconds. */
+            /* choose the color for the frame we will draw. The sine wave trick makes it fade between colors smoothly. */
+            red = (float)(0.5 + 0.5 * SDL_sin(now));
+            green = (float)(0.5 + 0.5 * SDL_sin(now + SDL_PI_D * 2 / 3));
+            blue = (float)(0.5 + 0.5 * SDL_sin(now + SDL_PI_D * 4 / 3));
+        }
+
         SDL_SetRenderDrawColorFloat(renderer, red, green, blue, SDL_ALPHA_OPAQUE_FLOAT);  /* new color, full alpha. */
 
         /* clear the window to the draw color. */
@@ -391,25 +415,46 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 
         //Draw the platforms
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  // white
+            for (int i = 0; i < MAX_PLATFORMS; ++i) {
+                SDL_FRect plat_rect = {
+                    platforms[i].x, platforms[i].y,
+                    platforms[i].width, platforms[i].height
+                };
+                SDL_RenderFillRect(renderer, &plat_rect);
+            }
 
-        for (int i = 0; i < MAX_PLATFORMS; ++i) {
-            SDL_FRect plat_rect = {
-                platforms[i].x, platforms[i].y,
-                platforms[i].width, platforms[i].height
-            };
-            SDL_RenderFillRect(renderer, &plat_rect);
+            // Draw the player
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE); // black
+            r.x = player->x;
+            r.y = player->y;
+            r.w = r.h = PLAYER_SIZE;
+
+            SDL_RenderFillRect(renderer, &r);
+
+            /* put the newly-cleared rendering on the screen. */
+            SDL_RenderPresent(renderer);
+        
+        
+        if (as->game_state == retry_menu) {
+
+            SDL_SetRenderDrawColorFloat(renderer, red, green, blue, SDL_ALPHA_OPAQUE_FLOAT);  /* new color, full alpha. */
+
+            SDL_FRect background_rect = {(SCREEN_WIDTH / 2) - 150, (SCREEN_HEIGHT / 2) - 100, 300, 450};
+            SDL_SetRenderDrawColor(renderer, 100, 3, 15, SDL_ALPHA_OPAQUE);
+            SDL_RenderFillRect(renderer, &background_rect);
+
+            SDL_FRect retry_rect = { retry_button.x, retry_button.y, retry_button.len, retry_button.width };
+            SDL_SetRenderDrawColor(renderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
+            SDL_RenderFillRect(renderer, &retry_rect);
+
+            SDL_FRect quit_rect = { quit_button.x, quit_button.y, quit_button.len, quit_button.width };
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+            SDL_RenderFillRect(renderer, &quit_rect);
+
+            SDL_RenderPresent(renderer);
         }
 
-        // Draw the player
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE); // black
-        r.x = player->x;
-        r.y = player->y;
-        r.w = r.h = PLAYER_SIZE;
-
-        SDL_RenderFillRect(renderer, &r);
-
-        /* put the newly-cleared rendering on the screen. */
-        SDL_RenderPresent(renderer);
+        return SDL_APP_CONTINUE;
     }
 
     return SDL_APP_CONTINUE;  /* carry on with the program! */
