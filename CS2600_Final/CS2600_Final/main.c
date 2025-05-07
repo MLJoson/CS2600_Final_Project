@@ -19,8 +19,9 @@
 #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <stdlib.h>
 
-  /* We will use this renderer to draw into this window every frame. */
+/* We will use this renderer to draw into this window every frame. */
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
 
@@ -76,14 +77,13 @@ typedef struct {
 } Platform;
 
 
-
-/*Play Button*/
+/* Button */
 typedef struct {
     float x, y;
     float len, width;
 
     char text[8];
-} Play_Button;
+} Button;
 
 /*Quit Button*/
 typedef struct {
@@ -117,18 +117,11 @@ void initialize_platforms(Platform platforms[]) {
     platforms[MAX_PLATFORMS - 1].x = (SCREEN_WIDTH / 2) - (PLATFORM_WIDTH / 2);
 }
 
-Play_Button start_button;
-Play_Button retry_button;
-void initialize_play_button(Play_Button *button, float x, float y, float len, float width, char *text) {
-    button->x = x;
-    button->y = y;
-    button->len = len;
-    button->width = width;
-    strcpy_s(button->text, sizeof(button->text), text);
-}
-
-Quit_Button quit_button;
-void initialize_quit_button(Play_Button* button, float x, float y, float len, float width, char* text) {
+/* Initializes two similar buttons to start/restart the game. */
+Button start_button;
+Button retry_button;
+Button quit_button;
+void initialize_button(Button *button, float x, float y, float len, float width, char *text) {
     button->x = x;
     button->y = y;
     button->len = len;
@@ -168,10 +161,10 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
     initialize_platforms(platforms);
 
     //Initialize buttons
-    initialize_play_button(&start_button, 220, 450, 200, 80, "Play!");
-    initialize_play_button(&retry_button, 220, 350, 200, 80, "Retry");
+    initialize_button(&start_button, 220, 450, 200, 80, "Play!");
+    initialize_button(&retry_button, 220, 350, 200, 80, "Retry");
 
-    initialize_quit_button(&quit_button, 220, 570, 200, 80, "Quit");
+    initialize_button(&quit_button, 220, 570, 200, 80, "Quit");
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
@@ -419,7 +412,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
             SDL_RenderClear(renderer);
 
             //Draw the platforms
-                SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  // white
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  // white
             for (int i = 0; i < MAX_PLATFORMS; ++i) {
                 SDL_FRect plat_rect = {
                     platforms[i].x, platforms[i].y,

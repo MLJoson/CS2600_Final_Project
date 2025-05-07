@@ -1,11 +1,9 @@
 ﻿  main.c
-C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(110,26): warning C4013: 'rand' undefined; assuming extern returning int
 C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(110,33): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
 C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(111,28): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(174,28): warning C4133: 'function': incompatible types - from 'Quit_Button *' to 'Play_Button *'
-C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(237,33): warning C4244: '=': conversion from 'Uint64' to 'int', possible loss of data
-C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(251,33): warning C4244: '=': conversion from 'Uint64' to 'int', possible loss of data
-C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(307,32): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(321,35): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(382,30): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
+C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(230,33): warning C4244: '=': conversion from 'Uint64' to 'int', possible loss of data
+C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(244,33): warning C4244: '=': conversion from 'Uint64' to 'int', possible loss of data
+C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(300,32): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(314,35): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\CS2600_Final\main.c(375,30): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
   CS2600_Final.vcxproj -> C:\Users\lazer\OneDrive\Documents\GitHub\CS2600_Final_Project\CS2600_Final\x64\Debug\CS2600_Final.exe
