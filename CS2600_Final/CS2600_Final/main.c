@@ -19,6 +19,8 @@
 #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <stdio.h>
+#include <string.h>
 
   /* We will use this renderer to draw into this window every frame. */
 static SDL_Window* window = NULL;
@@ -39,6 +41,9 @@ static SDL_Renderer* renderer = NULL;
 #define MAX_PLATFORMS 10
 #define PLATFORM_HEIGHT 10
 #define PLATFORM_WIDTH 80
+
+/*Variables*/
+int score = 0;
 
 /* Player */
 typedef struct {
@@ -262,12 +267,15 @@ void update_player(Player* player) {
         {
             platforms[i].y = -10;
             platforms[i].x = (float)(rand() % (SCREEN_WIDTH - (int)platforms[i].width));
+            score += 10;
         }
     }
 
     // Check for player death
-    if (player->y > SCREEN_HEIGHT)
+    if (player->y > SCREEN_HEIGHT) {
         reset_game(player);
+        score = 0;
+    }
 }
 
 /* This function runs once per frame, and is the heart of the program. */
