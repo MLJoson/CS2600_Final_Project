@@ -43,6 +43,8 @@ static SDL_Renderer* renderer = NULL;
 #define PLATFORM_HEIGHT 10
 #define PLATFORM_WIDTH 80
 
+//#define SDL_DEBUG_TEXT_FORMAT_FONT_CHARACTER_SIZE 20
+
 /*Variables*/
 int score = 0;
 
@@ -328,8 +330,10 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     SDL_RenderFillRect(renderer, &r);
 
     // Draw the score
+    SDL_SetRenderScale(renderer, 3, 3);
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE); // black
-    SDL_RenderDebugTextFormat(renderer, 20, 20, "Score: %d", score);
+    SDL_RenderDebugTextFormat(renderer, 10, 10, "Score: %d", score);
+    SDL_SetRenderScale(renderer, 1, 1);
 
     /* put the newly-cleared rendering on the screen. */
     SDL_RenderPresent(renderer);
