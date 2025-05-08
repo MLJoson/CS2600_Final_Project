@@ -19,6 +19,7 @@
 #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <SDL3/SDL_render.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -120,6 +121,9 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
     // Initialize platform
     initialize_platforms(platforms);
     return SDL_APP_CONTINUE;  /* carry on with the program! */
+
+    // Set text color
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 }
 
 /* Key handling */
@@ -323,10 +327,15 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 
     SDL_RenderFillRect(renderer, &r);
 
+    // Draw the score
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE); // black
+    SDL_RenderDebugTextFormat(renderer, 20, 20, "Score: %d", score);
+
     /* put the newly-cleared rendering on the screen. */
     SDL_RenderPresent(renderer);
 
     return SDL_APP_CONTINUE;  /* carry on with the program! */
+
 }
 
 /* This function runs once at shutdown. */
