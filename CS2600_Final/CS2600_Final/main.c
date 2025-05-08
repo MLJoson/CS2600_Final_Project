@@ -418,7 +418,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
             as->red = red;
             as->green = green;
             as->blue = blue;
-
+        }
             SDL_SetRenderDrawColorFloat(renderer, as->red, as->green, as->blue, SDL_ALPHA_OPAQUE_FLOAT);  /* new color, full alpha. */
 
             /* clear the window to the draw color. */
