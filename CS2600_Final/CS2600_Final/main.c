@@ -19,6 +19,9 @@
 #define SDL_MAIN_USE_CALLBACKS 1  /* use the callbacks instead of main() */
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <SDL3/SDL_render.h>
+#include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
 /* We will use this renderer to draw into this window every frame. */
@@ -40,6 +43,11 @@ static SDL_Renderer* renderer = NULL;
 #define MAX_PLATFORMS 10
 #define PLATFORM_HEIGHT 10
 #define PLATFORM_WIDTH 80
+
+//#define SDL_DEBUG_TEXT_FORMAT_FONT_CHARACTER_SIZE 20
+
+/*Variables*/
+int score = 0;
 
 /* Player */
 typedef struct {
@@ -166,6 +174,9 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 
     initialize_button(&quit_button, 220, 570, 200, 80, "Quit");
     return SDL_APP_CONTINUE;  /* carry on with the program! */
+
+    // Set text color
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 }
 
 /* Key handling */
@@ -347,16 +358,20 @@ void update_player(Player* player, AppState* as) {
         {
             platforms[i].y = -10;
             platforms[i].x = (float)(rand() % (SCREEN_WIDTH - (int)platforms[i].width));
+            score += 10;
         }
     }
 
     // Check for player death
     if (player->y > SCREEN_HEIGHT) {
+        reset_game(player);
+        score = 0;
+        
+        //Retry menu
         as->game_state = retry_menu;
     }
 
-        
-    
+  
 }
 
 /* This function runs once per frame, and is the heart of the program. */
@@ -387,11 +402,9 @@ SDL_AppResult SDL_AppIterate(void* appstate)
         SDL_FRect quit_rect = { quit_button.x, quit_button.y, quit_button.len, quit_button.width };
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderFillRect(renderer, &quit_rect);
-
-        SDL_RenderPresent(renderer);
-        return SDL_APP_CONTINUE;
     }
 
+  
     if (as->game_state == game || as->game_state == retry_menu) {
         
         if (as->game_state == game) {
@@ -428,7 +441,13 @@ SDL_AppResult SDL_AppIterate(void* appstate)
             r.w = r.h = PLAYER_SIZE;
 
             SDL_RenderFillRect(renderer, &r);
-
+            
+            // Draw the score
+            SDL_SetRenderScale(renderer, 3, 3);
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE); // black
+            SDL_RenderDebugTextFormat(renderer, 10, 10, "Score: %d", score);
+            SDL_SetRenderScale(renderer, 1, 1);
+            
             /* put the newly-cleared rendering on the screen. */
             SDL_RenderPresent(renderer);
         }
@@ -452,6 +471,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     }
 
     return SDL_APP_CONTINUE;  /* carry on with the program! */
+
 }
 
 /* This function runs once at shutdown. */
