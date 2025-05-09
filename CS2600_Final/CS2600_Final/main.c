@@ -83,6 +83,7 @@ typedef struct {
 typedef struct {
     float x, y;
     float width, height;
+    int state, vel_x;
 } Platform;
 
 
@@ -120,6 +121,18 @@ void initialize_platforms(Platform platforms[]) {
         platforms[i].y = i * 70; //to space them out
         platforms[i].width = PLATFORM_WIDTH;
         platforms[i].height = PLATFORM_HEIGHT;
+        platforms[i].state = (rand() % 4) + 1;
+        platforms[i].vel_x = 0;
+        if (platforms[i].state == 1) {
+            int direction = (rand() % 2) + 1;
+            if (direction == 1) {
+                platforms[i].vel_x = 2;
+            }
+            else if (direction == 2) {
+                platforms[i].vel_x = -2;
+            }
+            
+        }
     }
 
     // Make sure there is a platform to catch the player
@@ -341,6 +354,22 @@ void update_player(Player* player, AppState* as) {
         }
     }
 
+    //if platform state == 1, have it move side to side
+    for (int i = 0; i < MAX_PLATFORMS; i++) {
+        if (platforms[i].state == 1) {
+            platforms[i].x += platforms[i].vel_x;
+            if (platforms[i].x > (SCREEN_WIDTH - (int)platforms[i].width)) {
+                platforms[i].x = SCREEN_WIDTH - (int)platforms[i].width - 1;
+                platforms[i].vel_x *= -1;
+            }
+            if (platforms[i].x < 0) {
+                platforms[i].x = 1;
+                platforms[i].vel_x *= -1;
+            }
+        }
+
+    }
+
     /* Use the player reaching the halfway point to move the platforms down
     to give the illusion of bouncing upwards*/
     if (player->y < SCREEN_HEIGHT / 2) {
@@ -359,6 +388,18 @@ void update_player(Player* player, AppState* as) {
         {
             platforms[i].y = -10;
             platforms[i].x = (float)(rand() % (SCREEN_WIDTH - (int)platforms[i].width));
+            platforms[i].state = (rand() % 4) + 1;
+            platforms[i].vel_x = 0;
+            if (platforms[i].state == 1) {
+                int direction = (rand() % 2) + 1;
+                if (direction == 1) {
+                    platforms[i].vel_x = 2;
+                }
+                else if (direction == 2) {
+                    platforms[i].vel_x = -2;
+                }
+
+            }
             score += 10;
         }
     }
