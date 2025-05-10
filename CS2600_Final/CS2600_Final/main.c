@@ -20,6 +20,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <SDL3/SDL_render.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -27,6 +28,7 @@
   /* We will use this renderer to draw into this window every frame. */
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
+static TTF_Font* font = NULL;
 
 /* Constants */
 #define FRAMES_PER_SECOND 60
@@ -174,6 +176,18 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
         return SDL_APP_FAILURE;
     }
 
+    // Initialize the font
+    if (TTF_Init() == -1) {
+        SDL_Log("Couldn't initialize TTF: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
+
+    font = TTF_OpenFont("arial.ttf", 24); // You'll need to provide a font file
+    if (!font) {
+        SDL_Log("Couldn't load font: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
+
     as->game_state = main_menu;
 
     // Initialize player
@@ -233,6 +247,27 @@ static SDL_AppResult handle_key_event_(Player* player, SDL_Event* event) {
 void reset_game(Player* player) {
     initialize_player(player);
     initialize_platforms(platforms);
+}
+
+// Create a helper function to render text
+void render_text(SDL_Renderer* renderer, TTF_Font* font, const char* text, SDL_FRect rect, SDL_Color color) {
+    // I added 'b' here so the it doens't crash but so far I'm stuck here
+    SDL_Surface* surface = TTF_RenderText_Solid(font, text, 'b', color);
+    if (!surface) {
+        SDL_Log("Couldn't create text surface: %s", SDL_GetError());
+        return;
+    }
+
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+    if (!texture) {
+        SDL_Log("Couldn't create text texture: %s", SDL_GetError());
+        SDL_DestroySurface(surface);
+        return;
+    }
+
+    SDL_RenderTexture(renderer, texture, NULL, &rect);
+    SDL_DestroyTexture(texture);
+    SDL_DestroySurface(surface);
 }
 
 /* This function runs when a new event (mouse input, keypresses, etc) occurs. */
@@ -436,13 +471,48 @@ SDL_AppResult SDL_AppIterate(void* appstate)
         SDL_SetRenderDrawColor(renderer, 100, 100, 255, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(renderer);
 
+        // Render game title (larger font)
+        SDL_Color title_color = { 255, 255, 0, 255 }; // Yellow color for title
+        SDL_FRect title_rect = {
+            SCREEN_WIDTH / 2 - 250,  // Centered horizontally
+            100,                   // Position from top
+            500,                   // Width
+            80                     // Height
+        };
+
+        // Create a larger font for the title (48pt instead of 24pt)
+        TTF_Font* title_font = TTF_OpenFont("arial.ttf", 48);
+        if (title_font) {
+            render_text(renderer, title_font, "Doodle Game 2: The Better Sequel Prequel", title_rect, title_color);
+            TTF_CloseFont(title_font);
+        }
+
         SDL_FRect play_rect = { start_button.x, start_button.y, start_button.len, start_button.width };
         SDL_SetRenderDrawColor(renderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderFillRect(renderer, &play_rect);
 
+        // Play button text
+        SDL_Color text_color = { 0, 0, 0, 255 };
+        SDL_FRect play_text_rect = {
+            play_rect.x + play_rect.w / 4,
+            play_rect.y + play_rect.h / 4,
+            play_rect.w / 2,
+            play_rect.h / 2
+        };
+        render_text(renderer, font, start_button.text, play_text_rect, text_color);
+
         SDL_FRect quit_rect = { quit_button.x, quit_button.y, quit_button.len, quit_button.width };
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderFillRect(renderer, &quit_rect);
+
+        // Quit button text
+        SDL_FRect quit_text_rect = {
+            quit_rect.x + quit_rect.w / 4,
+            quit_rect.y + quit_rect.h / 4,
+            quit_rect.w / 2,
+            quit_rect.h / 2
+        };
+        render_text(renderer, font, quit_button.text, quit_text_rect, text_color);
 
         SDL_RenderPresent(renderer);
     }
@@ -501,9 +571,49 @@ SDL_AppResult SDL_AppIterate(void* appstate)
             SDL_SetRenderDrawColor(renderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
             SDL_RenderFillRect(renderer, &retry_rect);
 
+            // Retry button text
+            SDL_Color text_color = { 0, 0, 0, 255 }; // Black text
+            SDL_FRect retry_text_rect = {
+                retry_rect.x + retry_rect.w / 4,
+                retry_rect.y + retry_rect.h / 4,
+                retry_rect.w / 2,
+                retry_rect.h / 2
+            };
+            render_text(renderer, font, retry_button.text, retry_text_rect, text_color);
+
             SDL_FRect quit_rect = { quit_button.x, quit_button.y - 100, quit_button.len, quit_button.width };
             SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
             SDL_RenderFillRect(renderer, &quit_rect);
+
+            // Quit button text
+            SDL_FRect quit_text_rect = {
+                quit_rect.x + quit_rect.w / 4,
+                quit_rect.y + quit_rect.h / 4,
+                quit_rect.w / 2,
+                quit_rect.h / 2
+            };
+            render_text(renderer, font, quit_button.text, quit_text_rect, text_color);
+
+            // Add "Game Over" title text
+            SDL_Color title_color = { 255, 255, 255, 255 }; // White text
+            SDL_FRect title_rect = {
+                background_rect.x + background_rect.w / 4,
+                background_rect.y + 30,
+                background_rect.w / 2,
+                50
+            };
+            render_text(renderer, font, "Game Over", title_rect, title_color);
+
+            // Add final score text
+            SDL_FRect score_rect = {
+                background_rect.x + background_rect.w / 4,
+                background_rect.y + 100,
+                background_rect.w / 2,
+                40
+            };
+            char score_text[32];
+            snprintf(score_text, sizeof(score_text), "Score: %d", score);
+            render_text(renderer, font, score_text, score_rect, title_color);
         }
 
         /* put the newly-cleared rendering on the screen. */
@@ -523,6 +633,12 @@ void SDL_AppQuit(void* appstate, SDL_AppResult result)
         AppState* as = (AppState*)appstate;
         SDL_free(as);
     }
+
+     if (font) {
+        TTF_CloseFont(font);
+        font = NULL;
+    }
+    TTF_Quit();
 }
 
 
