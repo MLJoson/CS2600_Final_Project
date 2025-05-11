@@ -25,7 +25,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-  /* We will use this renderer to draw into this window every frame. */
+/* We will use this renderer to draw into this window every frame. */
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
 static TTF_Font* font = NULL;
@@ -46,7 +46,7 @@ static TTF_Font* font = NULL;
 #define PLATFORM_HEIGHT 10
 #define PLATFORM_WIDTH 80
 
-//#define SDL_DEBUG_TEXT_FORMAT_FONT_CHARACTER_SIZE 20
+// #define SDL_DEBUG_TEXT_FORMAT_FONT_CHARACTER_SIZE 20
 
 /*Variables*/
 int score = 0;
@@ -191,12 +191,6 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
     }
 
     as->game_state = main_menu;
-
-    // Initialize player
-    initialize_player(&as->player);
-
-    // Initialize platform
-    initialize_platforms(platforms);
 
     //Initialize buttons
     initialize_button(&start_button, 220, 450, 200, 80, "Play!");
@@ -445,8 +439,6 @@ void update_player(Player* player, AppState* as) {
 
     // Check for player death
     if (player->y > SCREEN_HEIGHT) {
-        reset_game(player);
-
         //Retry menu
         as->game_state = retry_menu;
     }
@@ -490,6 +482,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
             TTF_CloseFont(title_font);
         }
 
+        
         SDL_FRect play_rect = { start_button.x, start_button.y, start_button.len, start_button.width };
         SDL_SetRenderDrawColor(renderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderFillRect(renderer, &play_rect);
@@ -535,7 +528,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
             as->green = green;
             as->blue = blue;
         }
-
+        
         SDL_SetRenderDrawColorFloat(renderer, as->red, as->green, as->blue, SDL_ALPHA_OPAQUE_FLOAT);  /* new color, full alpha. */
 
         /* clear the window to the draw color. */
