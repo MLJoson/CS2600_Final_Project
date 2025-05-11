@@ -6,9 +6,10 @@
  * Branden Romero
  */
 
- /* clear.c ... * /
-
  /*
+  * We used a template from the SDL3 website below to start our project
+  * 
+  * clear.c - https://examples.libsdl.org/SDL3/renderer/01-clear/
   * This example code creates an SDL window and renderer, and then clears the
   * window to a different color every frame, so you'll effectively get a window
   * that's smoothly fading between colors.
@@ -53,6 +54,10 @@ typedef struct {
     float vel_y;
     float vel_x;
 
+    // Checks if player has started the game
+    // 0 for false, 1 for true
+    int has_player_started;
+
     // For key handling
     bool holdRight;
     bool holdLeft;
@@ -96,6 +101,7 @@ typedef struct {
 
 /* Initializes the player on startup or restart */
 void initialize_player(Player* player) {
+    player->has_player_started = 0;
     player->x = PLAYER_SPAWN_X - (PLAYER_SIZE / 2);
     player->y = PLAYER_SPAWN_Y;
     player->vel_y = 0.0;
@@ -112,20 +118,24 @@ void initialize_platforms(Platform platforms[]) {
         platforms[i].height = PLATFORM_HEIGHT;
         platforms[i].state = (rand() % 4) + 1;
         platforms[i].vel_x = 0;
+
+        // If the state is 1 (which has a 25% to happen), then the platform moves
         if (platforms[i].state == 1) {
             int direction = (rand() % 2) + 1;
+            // Platform moves to the right
             if (direction == 1) {
                 platforms[i].vel_x = 2;
             }
+            // Platform moves to the left
             else if (direction == 2) {
                 platforms[i].vel_x = -2;
             }
-            
         }
     }
 
     // Make sure there is a platform to catch the player
     platforms[MAX_PLATFORMS - 1].x = (SCREEN_WIDTH / 2) - (PLATFORM_WIDTH / 2);
+    platforms[MAX_PLATFORMS - 1].state = 2;
 }
 
 /* Initializes two similar buttons to start/restart the game. */
@@ -169,36 +179,39 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
         return SDL_APP_FAILURE;
     }
 
-    font = TTF_OpenFont("arial.ttf", 24); // You'll need to provide a font file
+    font = TTF_OpenFont("Daydream.ttf", 24); // You'll need to provide a font file
     if (!font) {
         SDL_Log("Couldn't load font: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
 
+    // Make the current game state to main menu
     as->game_state = main_menu;
 
-    //Initialize buttons
+    // Initialize buttons
     initialize_button(&start_button, 220, 450, 200, 80, "Play!");
     initialize_button(&retry_button, 220, 350, 200, 80, "Retry");
     initialize_button(&quit_button, 220, 570, 200, 80, "Quit");
     return SDL_APP_CONTINUE;  /* carry on with the program! */
-
-    // Set text color
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 }
 
 /* Key handling */
 static SDL_AppResult handle_key_event_(Player* player, SDL_Event* event) {
     if (event->type == SDL_EVENT_KEY_DOWN) {
+        // Starts the game if the player has not yet
+        player->has_player_started = 1;
+
         switch (event->key.scancode) {
             // Pressing Q quits the game
         case SDL_SCANCODE_Q:
             return SDL_APP_SUCCESS;
 
             // Movement keys for the player
+        case SDL_SCANCODE_D:
         case SDL_SCANCODE_RIGHT:
             player->holdRight = true;
             break;
+        case SDL_SCANCODE_A:
         case SDL_SCANCODE_LEFT:
             player->holdLeft = true;
             break;
@@ -209,9 +222,11 @@ static SDL_AppResult handle_key_event_(Player* player, SDL_Event* event) {
     else if (event->type == SDL_EVENT_KEY_UP) {
         switch (event->key.scancode) {
             // Movement keys for the player
+        case SDL_SCANCODE_D:
         case SDL_SCANCODE_RIGHT:
             player->holdRight = false;
             break;
+        case SDL_SCANCODE_A:
         case SDL_SCANCODE_LEFT:
             player->holdLeft = false;
             break;
@@ -229,9 +244,9 @@ void reset_game(Player* player) {
     initialize_platforms(platforms);
 }
 
-// Create a helper function to render text
+/* Create a helper function to render text */
 void render_text(SDL_Renderer* renderer, TTF_Font* font, const char* text, SDL_FRect rect, SDL_Color color) {
-    SDL_Surface* surface = TTF_RenderText_Solid(font, text, 0, color);
+    SDL_Surface* surface = TTF_RenderText_Blended(font, text, 0, color);
     if (!surface) {
         SDL_Log("Couldn't create text surface: %s", SDL_GetError());
         return;
@@ -331,8 +346,30 @@ void move_player(Player* player) {
     }
 }
 
+/* Moves platform if it is assigned to */
+void move_platform() {
+    // if platform state == 1, have it move side to side
+    for (int i = 0; i < MAX_PLATFORMS; i++) {
+        if (platforms[i].state == 1) {
+            platforms[i].x += platforms[i].vel_x;
+            if (platforms[i].x > (SCREEN_WIDTH - (int)platforms[i].width)) {
+                platforms[i].x = SCREEN_WIDTH - (int)platforms[i].width - 1;
+                platforms[i].vel_x *= -1;
+            }
+            if (platforms[i].x < 0) {
+                platforms[i].x = 1;
+                platforms[i].vel_x *= -1;
+            }
+        }
+    }
+}
+
 /* Updates players position and velocity*/
 void update_player(Player* player, AppState* as) {
+    // If player has not started, then leave him unmoving
+    if (player->has_player_started == 0)
+        return;
+
     // Adds gravity to y-velocity
     player->vel_y += GRAVITY;
 
@@ -372,21 +409,7 @@ void update_player(Player* player, AppState* as) {
         }
     }
 
-    //if platform state == 1, have it move side to side
-    for (int i = 0; i < MAX_PLATFORMS; i++) {
-        if (platforms[i].state == 1) {
-            platforms[i].x += platforms[i].vel_x;
-            if (platforms[i].x > (SCREEN_WIDTH - (int)platforms[i].width)) {
-                platforms[i].x = SCREEN_WIDTH - (int)platforms[i].width - 1;
-                platforms[i].vel_x *= -1;
-            }
-            if (platforms[i].x < 0) {
-                platforms[i].x = 1;
-                platforms[i].vel_x *= -1;
-            }
-        }
-
-    }
+    
 
     /* Use the player reaching the halfway point to move the platforms down
     to give the illusion of bouncing upwards*/
@@ -442,6 +465,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     if (as->game_state == game) {
         while ((SDL_GetTicks() - as->last_step) >= STEP_RATE_IN_MILLISECONDS) {
             update_player(player, as);
+            move_platform();
             as->last_step += STEP_RATE_IN_MILLISECONDS;
         }
     }
@@ -454,16 +478,25 @@ SDL_AppResult SDL_AppIterate(void* appstate)
         // Render game title (larger font)
         SDL_Color title_color = { 255, 255, 0, 255 }; // Yellow color for title
         SDL_FRect title_rect = {
-            SCREEN_WIDTH / 2 - 250,  // Centered horizontally
+            SCREEN_WIDTH / 2 - 300,  // Centered horizontally
             100,                   // Position from top
-            500,                   // Width
+            600,                   // Width
             80                     // Height
         };
 
         // Create a larger font for the title (48pt instead of 24pt)
-        TTF_Font* title_font = TTF_OpenFont("arial.ttf", 48);
+        TTF_Font* title_font = TTF_OpenFont("Daydream.ttf", 48);
         if (title_font) {
-            render_text(renderer, title_font, "Doodle Game 2: The Better Sequel Prequel", title_rect, title_color);
+            // Main title
+            render_text(renderer, title_font, "DOODLE GAME 2", title_rect, title_color);
+
+            // Subtitle
+            title_rect.x += 20;
+            title_rect.y += 120;
+            title_rect.h -= 40;
+            title_rect.w -= 40;
+
+            render_text(renderer, title_font, "The Better Sequel Prequel", title_rect, title_color);
             TTF_CloseFont(title_font);
         }
 
@@ -520,7 +553,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
         /* clear the window to the draw color. */
         SDL_RenderClear(renderer);
 
-        //Draw the platforms
+        // Draw the platforms
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  // white
         for (int i = 0; i < MAX_PLATFORMS; ++i) {
             SDL_FRect plat_rect = {
@@ -542,6 +575,14 @@ SDL_AppResult SDL_AppIterate(void* appstate)
         SDL_SetRenderScale(renderer, 3, 3);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE); // black
         SDL_RenderDebugTextFormat(renderer, 10, 10, "Score: %d", as->score);
+
+        // Draw the instructions for start of game
+        if (player->has_player_started == 0) {
+            SDL_RenderDebugTextFormat(renderer, 15, SCREEN_HEIGHT / 5, "Press A/D or arrow keys");
+            SDL_RenderDebugTextFormat(renderer, 70, SCREEN_HEIGHT / 5 + 10, "to move!");
+        }
+
+        // Reset render scale
         SDL_SetRenderScale(renderer, 1, 1);
 
         if (as->game_state == retry_menu) {
@@ -556,9 +597,9 @@ SDL_AppResult SDL_AppIterate(void* appstate)
             // Retry button text
             SDL_Color text_color = { 0, 0, 0, 255 }; // Black text
             SDL_FRect retry_text_rect = {
-                retry_rect.x + retry_rect.w / 4,
+                retry_rect.x + retry_rect.w / 4 - 10,
                 retry_rect.y + retry_rect.h / 4,
-                retry_rect.w / 2,
+                retry_rect.w / 2 + 20,
                 retry_rect.h / 2
             };
             render_text(renderer, font, retry_button.text, retry_text_rect, text_color);
@@ -579,18 +620,18 @@ SDL_AppResult SDL_AppIterate(void* appstate)
             // Add "Game Over" title text
             SDL_Color title_color = { 255, 255, 255, 255 }; // White text
             SDL_FRect title_rect = {
-                background_rect.x + background_rect.w / 4,
+                background_rect.x + background_rect.w / 4 - 40,
                 background_rect.y + 30,
-                background_rect.w / 2,
+                background_rect.w / 2 + 80,
                 50
             };
             render_text(renderer, font, "Game Over", title_rect, title_color);
 
             // Add final score text
             SDL_FRect score_rect = {
-                background_rect.x + background_rect.w / 4,
-                background_rect.y + 100,
-                background_rect.w / 2,
+                background_rect.x + background_rect.w / 4 - 10,
+                background_rect.y + 110,
+                background_rect.w / 2 + 20,
                 40
             };
             char score_text[32];
