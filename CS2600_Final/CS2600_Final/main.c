@@ -46,11 +46,6 @@ static TTF_Font* font = NULL;
 #define PLATFORM_HEIGHT 10
 #define PLATFORM_WIDTH 80
 
-// #define SDL_DEBUG_TEXT_FORMAT_FONT_CHARACTER_SIZE 20
-
-/*Variables*/
-int score = 0;
-
 /* Player */
 typedef struct {
     float x;
@@ -98,16 +93,6 @@ typedef struct {
 
     char text[8];
 } Button;
-
-/* Quit Button */
-typedef struct {
-    float x, y;
-    float len, width;
-
-    char text[8];
-} Quit_Button;
-
-/* Options Button */
 
 /* Initializes the player on startup or restart */
 void initialize_player(Player* player) {
@@ -195,7 +180,6 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
     //Initialize buttons
     initialize_button(&start_button, 220, 450, 200, 80, "Play!");
     initialize_button(&retry_button, 220, 350, 200, 80, "Retry");
-
     initialize_button(&quit_button, 220, 570, 200, 80, "Quit");
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 
@@ -247,7 +231,6 @@ void reset_game(Player* player) {
 
 // Create a helper function to render text
 void render_text(SDL_Renderer* renderer, TTF_Font* font, const char* text, SDL_FRect rect, SDL_Color color) {
-    // I added 'b' here so the it doens't crash but so far I'm stuck here
     SDL_Surface* surface = TTF_RenderText_Solid(font, text, 0, color);
     if (!surface) {
         SDL_Log("Couldn't create text surface: %s", SDL_GetError());
@@ -276,6 +259,7 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
         float mouse_x = event->button.x;
         float mouse_y = event->button.y;
 
+        /* Starts game if clicked in start button, closes app if quit button clicked. */
         if (as->game_state == main_menu) {
             SDL_FRect play_rect = { start_button.x, start_button.y, start_button.len, start_button.width };
             SDL_FRect quit_rect = { quit_button.x, quit_button.y, quit_button.len, quit_button.width };
@@ -290,7 +274,8 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
                 return SDL_APP_SUCCESS;
             }
         }
-
+        
+        /* Starts game if clicked in start button, closes app if quit button clicked. */
         if (as->game_state == retry_menu) {
             SDL_FRect retry_rect = { retry_button.x, retry_button.y, retry_button.len, retry_button.width };
             SDL_FRect quit_rect = { quit_button.x, quit_button.y - 100, quit_button.len, quit_button.width };
@@ -482,7 +467,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
             TTF_CloseFont(title_font);
         }
 
-        
+        // Creates the button for the play button
         SDL_FRect play_rect = { start_button.x, start_button.y, start_button.len, start_button.width };
         SDL_SetRenderDrawColor(renderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderFillRect(renderer, &play_rect);
@@ -497,6 +482,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
         };
         render_text(renderer, font, start_button.text, play_text_rect, text_color);
 
+        // Creates the button to quit
         SDL_FRect quit_rect = { quit_button.x, quit_button.y, quit_button.len, quit_button.width };
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderFillRect(renderer, &quit_rect);
