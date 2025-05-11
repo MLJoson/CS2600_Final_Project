@@ -79,6 +79,8 @@ typedef struct {
     float red;
     float green;
     float blue;
+
+    int score;
 } AppState;
 
 /* Platforms */
@@ -252,7 +254,7 @@ void reset_game(Player* player) {
 // Create a helper function to render text
 void render_text(SDL_Renderer* renderer, TTF_Font* font, const char* text, SDL_FRect rect, SDL_Color color) {
     // I added 'b' here so the it doens't crash but so far I'm stuck here
-    SDL_Surface* surface = TTF_RenderText_Solid(font, text, 'b', color);
+    SDL_Surface* surface = TTF_RenderText_Solid(font, text, 0, color);
     if (!surface) {
         SDL_Log("Couldn't create text surface: %s", SDL_GetError());
         return;
@@ -286,6 +288,7 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 
             if (SDL_PointInRectFloat(&(SDL_FPoint) { mouse_x, mouse_y }, & play_rect)) {
                 as->game_state = game;
+                as->score = 0;
                 reset_game(player);
                 as->last_step = SDL_GetTicks();
             }
@@ -300,6 +303,7 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 
             if (SDL_PointInRectFloat(&(SDL_FPoint) { mouse_x, mouse_y }, & retry_rect)) {
                 as->game_state = game;
+                as->score = 0;
                 reset_game(player);
                 as->last_step = SDL_GetTicks();
             }
@@ -435,14 +439,13 @@ void update_player(Player* player, AppState* as) {
                 }
 
             }
-            score += 10;
+            as->score += 10;
         }
     }
 
     // Check for player death
     if (player->y > SCREEN_HEIGHT) {
         reset_game(player);
-        score = 0;
 
         //Retry menu
         as->game_state = retry_menu;
@@ -559,7 +562,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
         // Draw the score
         SDL_SetRenderScale(renderer, 3, 3);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE); // black
-        SDL_RenderDebugTextFormat(renderer, 10, 10, "Score: %d", score);
+        SDL_RenderDebugTextFormat(renderer, 10, 10, "Score: %d", as->score);
         SDL_SetRenderScale(renderer, 1, 1);
 
         if (as->game_state == retry_menu) {
@@ -612,7 +615,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
                 40
             };
             char score_text[32];
-            snprintf(score_text, sizeof(score_text), "Score: %d", score);
+            snprintf(score_text, sizeof(score_text), "Score: %d", as->score);
             render_text(renderer, font, score_text, score_rect, title_color);
         }
 
