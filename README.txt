@@ -1,5 +1,6 @@
 CS2600 Final Project
 
+GitHub: https://github.com/MLJoson/CS2600_Final_Project
 Group Members: Marco Joson, Chelsea Ocampo, Lucia Maturino Iniguez, Brandon Romero, Ethan Nhan
 
 This project is to create an application/game based off of the mobile game "Doodle Jump". Using what we have learned about C and
