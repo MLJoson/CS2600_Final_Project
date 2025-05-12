@@ -1,3 +1,3 @@
 all: main
 main: main.c
-	gcc main.c -o main -I$(HOME)/.local/include -L$(HOME)./local/lib -lSDL3 -lSDL3_ttf
+	gcc main.c -o main $(pkg-config --cflags --libs sdl3 sdl3-ttf)

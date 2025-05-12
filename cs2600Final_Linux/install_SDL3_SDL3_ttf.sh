@@ -4,7 +4,7 @@ set -e
 
 echo "Installing cmake to build libraries: "
 sudo apt update
-sudo apt install cmake
+sudo apt install -y cmake git build-essential libfreetype6-dev libx11-dev libxext-dev libxrandr-dev pkg-config
 
 mkdir -p ~/sdl3_build
 cd ~/sdl3_build
