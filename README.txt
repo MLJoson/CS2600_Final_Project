@@ -15,7 +15,7 @@ Installation process:
 	Run the 'install_SDL3_SDL3_ttf.sh' script to install all necessary libraries to run the application.
 
 Running the application:
-	1) Run the 'temp_var.sh' script to set environment variables to run the game. Must set these variables each terminal session. 
+	1) Run the 'temp_var.sh' with '. temp_var.sh' script to set environment variables to run the game. Must set these variables each terminal session. 
 	2) Then, run the makefile using 'make' and start the 'main' executable.
 	3) When the application starts, the main menu screen shows up displaying the title, start button, and quit button.
 		a. Press the start button to begin playing the game.
