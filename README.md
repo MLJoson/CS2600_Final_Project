@@ -1,5 +1,5 @@
 # CS2600_Final_Project
-Group Members: Marco Joson, Chelsea Ocampo, Lucia Maturino Iniguez, Brandon Romero, Ethan Nhan
+Group Members: Marco Joson, Chelsea Ocampo, Lucia Maturino Iniguez, Branden Romero, Ethan Nhan
 
 This project is to create an application/game based off of the mobile game "Doodle Jump". Using what we have learned about C and
 SDL, we were able to replicate the basic mechanics of the "Doodle Jump" and create a functioning menu and end screen. 
